@@ -1,0 +1,17 @@
+pyspark==3.5.0
+delta-spark==3.0.0
+scrapfly-sdk
+loguru
+python-dotenv
+jupyterlab==4.5.6  # Versión anclada para garantizar compatibilidad con dependencias
+papermill          # Orquestación notebooks con Airflow
+nest_asyncio       # Habilita bucles asíncronos dentro de celdas de Jupyter
+parsel             # Dependencia del scrapeo con Scrapfly
+pandas
+pyarrow
+deltalake
+openai
+pandarallel
+scikit-learn
+matplotlib
+seaborn

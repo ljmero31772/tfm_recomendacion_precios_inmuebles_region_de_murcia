@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  tfm-workspace:
+    build: .
+    image: tfm-data-engineer-image-ia
+    container_name: tfm_workspace_container_ia
+    env_file:
+      - .env
+    environment:
+      - SCRAPFLY_KEY=${SCRAPFLY_KEY}
+      - ENV=dev
+      # Configuración de orquestación (Apache Airflow)
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False # Desactivar DAGs de ejemplo para optimizar rendimiento
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=sqlite:////var/lib/airflow/airflow.db
+      - AIRFLOW__CORE__DAGS_FOLDER=/tfm/airflow/tfm
+      - AIRFLOW__SCHEDULER__DAG_DIR_LIST_INTERVAL=300 # Intervalo de escaneo de DAGs (segundos)
+      - AIRFLOW__LOGGING__LOGGING_LEVEL=WARNING
+      - AIRFLOW__LOGGING__REMOTE_LOGGING=False
+      - AIRFLOW__LOGGING__ENABLE_XCOM_PICKLE=False
+      - TZ=UTC+2
+    ports:
+      - "8888:8888" # JupyterLab
+      - "8080:8080" # Airflow UI
+    volumes:
+      # Volumen persistente para la base de datos de metadatos de Airflow
+      - airflow_db_data:/var/lib/airflow
+      # Mapeos de volúmenes locales hacia el entorno del contenedor
+      - ../tfm_project/airflow:/tfm/airflow
+      - ../tfm_project/python_notebooks:/tfm/python_notebooks
+      - ../tfm_project/delta_lake:/tfm/delta_lake
+      - ../tfm_project/spark-warehouse:/tfm/spark-warehouse
+      # Mapeo del directorio de scripts de infraestructura y configuración
+      - .:/tfm/local_docker_ia
+    deploy:
+      resources:
+        limits:
+          cpus: '8.0'
+          memory: 8192M # 8 GB
+    restart: "unless-stopped"
+    tty: true
+    stdin_open: true
+
+volumes:
+  airflow_db_data:
+
